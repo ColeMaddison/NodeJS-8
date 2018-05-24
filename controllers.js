@@ -5,7 +5,8 @@ const path = require('path');
 
 let dir = path.join(__dirname, 'public/img');
 
-exports.ejsRender = (req, res, next)=>{
+// images and messages render handler via ejs templates
+exports.ejsRender = (req, res)=>{
     let itemsDir = [];
     fs.readdir(dir, (err, items)=>{
         if(err) console.error(err);
@@ -15,10 +16,24 @@ exports.ejsRender = (req, res, next)=>{
             itemsDir.push({img:`/img/${item}`, alt: item.split('.')[0]});
         });
         res.render('index', {
+            messages: req.app.locals.messages,
             title: 'New document',
             data: 'Some text',
             images: itemsDir
         });
     });
+};
+
+// show all saved messages
+exports.showMessages = (req, res)=>{
+    res.status(200).json({data: req.app.locals.messages});
+};
+
+// save a message
+exports.saveMessage = (req, res)=>{
+    let resMessage = req.body;
+    resMessage.date = new Date().toLocaleString();
+    req.app.locals.messages.push(resMessage);
+    res.send('OK');
 };
 
