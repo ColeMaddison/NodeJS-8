@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><%= title %></title>
+</head>
+<body>
+    <p><%= data %></p>
+    <% images.forEach(function(imageLink) { %>
+        <img src=<%= imageLink.img %> alt=<%= imageLink.alt %>>
+        <br>
+    <% }); %>
+</body>
+</html>
