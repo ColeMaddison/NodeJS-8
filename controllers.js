@@ -32,8 +32,14 @@ exports.showMessages = (req, res)=>{
 // save a message
 exports.saveMessage = (req, res)=>{
     let resMessage = req.body;
-    resMessage.date = new Date().toLocaleString();
-    req.app.locals.messages.push(resMessage);
+    let db = req.app.locals.messages;
+    db.push(resMessage);
+
+    // remove message timeout
+    setTimeout(()=>{
+        db.splice(resMessage, 1); // set timeout for every message
+    }, resMessage.show * 1000);
+
     res.send('OK');
 };
 

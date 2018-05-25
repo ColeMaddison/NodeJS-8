@@ -7,7 +7,7 @@ const mdl = require('./middleware');
 
 router.get('/', ctrl.ejsRender);
 
-router.post('/message', ctrl.saveMessage);
+router.post('/message', mdl.checkMessage, mdl.setEndDate, ctrl.saveMessage);
 
 router.get('/messages', ctrl.showMessages);
 
