@@ -7,6 +7,8 @@ exports.checkMessage = (req, res, next) => {
 exports.setEndDate = (req, res, next) => {
     let reqBody = req.body;
     let now = new Date();
+
+    // add id to remove messages
     reqBody._id = req.app.locals.messages.length;
     reqBody.date = now.toLocaleString();
     reqBody.endAtMs = now.getTime() + reqBody.show*1000;

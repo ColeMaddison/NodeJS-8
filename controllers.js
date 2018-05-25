@@ -35,9 +35,19 @@ exports.saveMessage = (req, res)=>{
     let db = req.app.locals.messages;
     db.push(resMessage);
 
+    // get message to remove
+    // arr.find did not work, had to do that because arr.length is dinamic and can reduce and enlarge
+    let mesToRemove = {};
+
+    for (let val of db){
+        if(val._id === resMessage._id){
+            mesToRemove = val;
+        }
+    }
+
     // remove message timeout
     setTimeout(()=>{
-        db.splice(resMessage, 1); // set timeout for every message
+        db.splice(db.indexOf(mesToRemove), 1);
     }, resMessage.show * 1000);
 
     res.send('OK');
