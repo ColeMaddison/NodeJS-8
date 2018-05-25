@@ -36,7 +36,7 @@ exports.saveMessage = (req, res)=>{
     db.push(resMessage);
 
     // get message to remove
-    // arr.find did not work, had to do that because arr.length is dinamic and can reduce and enlarge
+    // arr.find did not work, had to do that because arr.length is dinamic (arr.length is id of messages) and can reduce and enlarge
     let mesToRemove = {};
 
     for (let val of db){
