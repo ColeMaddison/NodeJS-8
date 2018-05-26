@@ -5,11 +5,13 @@
 </head>
 <body>
     <p><%= data %></p>
-    <li>
-        <% messages.forEach(function(message) { %>
-            <ul><%= message.date %>: <strong><%= message.username %></strong> - <%= message.message %></ul>
-        <% }); %>
-    </li>
+    <% if(messages.length){ %>
+        <li>
+            <% messages.forEach(function(message) { %>
+                <ul><%= message.date %>: <strong><%= message.username %></strong> - <%= message.message %></ul>
+            <% }); %>
+        </li>
+    <% } %>
     <% images.forEach(function(imageLink) { %>
         <img src=<%= imageLink.img %> alt=<%= imageLink.alt %>>
         <br>

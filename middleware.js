@@ -5,6 +5,7 @@ exports.checkMessage = (req, res, next) => {
     const reqMes = req.body.message;
     const reqShow = req.body.show;
 
+    // post req validation
     if(!reqUser || !reqMes || !reqShow){
         res.status(404).json({message: "Field/s is/are empty!"});
     } else if(!(typeof reqUser === "string")){
@@ -19,8 +20,7 @@ exports.checkMessage = (req, res, next) => {
         res.status(404).json({message: "Show time is not a number"});
     } else if(!(reqShow > 0) || !(reqShow < 61)){
         res.status(404).json({message: "Show must be from 1 to 60"});
-    }
-    else {
+    } else {
         next();
     }
 };
