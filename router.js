@@ -5,7 +5,7 @@ const router = express.Router();
 const ctrl = require('./controllers');
 const mdl = require('./middleware');
 
-router.get('/', ctrl.ejsRender);
+router.get('/', mdl.getFavicon, ctrl.ejsRender);
 
 router.post('/message', mdl.checkMessage, mdl.setEndDate, ctrl.saveMessage);
 

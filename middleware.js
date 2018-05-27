@@ -36,3 +36,13 @@ exports.setEndDate = (req, res, next) => {
     reqBody.endAt = (new Date(reqBody.endAtMs)).toLocaleString();
     next();
 };
+
+exports.getFavicon = (req, res, next) => {    
+    if(require('url').parse(req.url) === "/favicon.ico"){
+        const stream = require('fs').createReadStream(require('path').join(__dirname, './public', 'favicon.ico'));
+        stream.on('open', ()=>{
+            stream.pipe(res);
+        });
+    }
+    next();
+};
