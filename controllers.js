@@ -35,7 +35,8 @@ exports.showMessages = (req, res)=>{
 
     // if query - check if key in db - check every item in db, if nothing found - break to outer loop to start over from new db item
     if(query){
-        OUTER:
+        // OUTER: // <--- labels solution
+        let breaker = false; // --- solution to avoid labels
         for(let dbItem of db){
             for(let item in queryObj){
                 if(!(item === "endAt" || item === "username")){
@@ -44,9 +45,14 @@ exports.showMessages = (req, res)=>{
                     if(queryObj[item] === dbItem[item]){
                         continue;
                     } else {
-                        break OUTER;
+                        // break OUTER; // <--- labels solution
+                        breaker = true; // --- solution to avoid labels
                     }
                 }
+            }
+            if(breaker){             //  ---|
+                breaker = false;     // ------- solution to avoid labels
+                break;               //  ---|
             }
             searchRes.push(dbItem);
         }
