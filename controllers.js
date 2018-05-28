@@ -39,7 +39,7 @@ exports.showMessages = (req, res)=>{
         for(let dbItem of db){
             for(let item in queryObj){
                 if(!(item === "endAt" || item === "username")){
-                    return res.status(404).end("Bad qquery1");
+                    return res.status(404).end("Bad query");
                 } else {
                     if(queryObj[item] === dbItem[item]){
                         continue;
@@ -49,6 +49,9 @@ exports.showMessages = (req, res)=>{
                 }
             }
             searchRes.push(dbItem);
+        }
+        if(!searchRes.length){
+            return res.end("Nothing found");
         }
         res.json(searchRes);
     } else {
