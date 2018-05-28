@@ -33,40 +33,18 @@ exports.showMessages = (req, res)=>{
     let db = req.app.locals.messages;
     let searchRes = [];
 
-    // check if query keys are in database
-    // if(query){
-    //     for(let item in queryObj){
-    //         if(!(item === "endAt" || item === "username")){
-    //             res.status(404).send("Bad query1");
-    //         } else {
-    //             // get messages from db
-    //             for(let dbItem of db){
-    //                 if(queryObj[item] === dbItem[item]){
-    //                     searchRes.push(dbItem);
-    //                 } else {
-    //                     res.status(404).send("Bad query");
-    //                 }
-    //             }
-    //             continue;
-    //         }
-    //     }   
-    //     res.json(searchRes);
-    // } else {
-    //     res.status(200).json({data: db});
-    // }
-    
+    // if query - check if key in db - check every item in db, if nothing found - break to outer loop to start over from new db item
     if(query){
+        OUTER:
         for(let dbItem of db){
             for(let item in queryObj){
                 if(!(item === "endAt" || item === "username")){
-                    res.status(404).send("Bad qquery1");
+                    return res.status(404).end("Bad qquery1");
                 } else {
                     if(queryObj[item] === dbItem[item]){
                         continue;
                     } else {
-                        console.log(db.length);
-                        // break;
-                        // res.status(404).end("Bad query");
+                        break OUTER;
                     }
                 }
             }
