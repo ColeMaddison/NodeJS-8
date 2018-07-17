@@ -1,95 +1,129 @@
 'use strict';
 
-const fs = require('fs');
+// const fs = require('fs');
 const path = require('path');
 const querystring = require('querystring');
 const url = require('url');
+const selectOptions = require('./utils');
+const MessageModel = require('./messageModel/messageModel');
 
-let dir = path.join(__dirname, 'public/img');
+// index route
+exports.startPage = (req, res) =>{
+    res.render(
+        path.join(__dirname, 'views/client'),
+        {
+            endsAt: selectOptions.endAtSeconds,
+            title: 'NodeJs E6'
+        }
+    );
+}
 
-// images and messages render handler via ejs templates
-exports.ejsRender = (req, res)=>{
-    let itemsDir = [];
-    fs.readdir(dir, (err, items)=>{
-        if(err) console.error(err);
-        items.forEach(item=>{
-            // go up dir because will be used in teh views folder
-            // MAKE SURE!!!! use containing folder, because public folder is already mentioned in static app.use(server.js)
-            itemsDir.push({img:`/img/${item}`, alt: item.split('.')[0]});
-        });
-        res.render('index', {
-            messages: req.app.locals.messages,
-            title: 'New document',
-            data: 'Some text',
-            images: itemsDir
-        });
+exports.postMessage = (req, res) => {
+    const data = req.body;
+    const userMessage = new MessageModel({
+        username: data.username,
+        message: data.message,
+        show: data.show,
+        endsAt: (Date.now() + (data.show * 1000))
     });
-};
 
-// show all saved messages
-exports.showMessages = (req, res)=>{
-    let query = url.parse(req.url).query;
-    let queryObj = querystring.parse(query);
-    let db = req.app.locals.messages;
-    let searchRes = [];
+    userMessage.save(err => {
+        if(err){
+            console.log(err);
+        } else {
+            res.send({message: 'Message added'});
+        }
+    });
+}
 
-    // if query - check if key in db - check every item in db, if nothing found - break to outer loop to start over from new db item
+exports.getAllMessages = (req, res) => {
+    const query = url.parse(req.url).query;
     if(query){
-        // OUTER: // <--- labels solution
-        let breaker = false; // --- solution to avoid labels
-        for(let dbItem of db){
-            for(let item in queryObj){
-                if(!(item === "endAt" || item === "username")){
-                    return res.status(404).end("Bad query");
+        showMessagesWithQuery(query, res);
+    } else {
+        showMessagesNoQuery(res);
+    }
+}
+
+const showMessagesWithQuery = (query, res) => {
+    const queryObj = querystring.parse(query);
+    
+    if(!('endsAt' in queryObj || 'user' in queryObj)){
+        return res.status(404).end("Bad query");
+    } else {
+        let endsAtSort = {endsAt: 'asc'};
+        let usernameFind = queryObj.user ? {'username': queryObj.user} : {};
+
+        if(queryObj.endsAt === 'asc' || queryObj.endsAt === 'desc'){
+            endsAtSort = {'endsAt': queryObj.endsAt};
+        }
+
+        MessageModel
+            .find(usernameFind)
+            .sort(endsAtSort)
+            .exec((err, messages) => {
+                if(err) {
+                    res.send(err);
                 } else {
-                    if(queryObj[item] === dbItem[item]){
-                        continue;
-                    } else {
-                        // break OUTER; // <--- labels solution
-                        breaker = true; // --- solution to avoid labels
-                    }
+                    res.render(
+                        path.join(__dirname, 'views/messages'),
+                        {
+                            messageData: messages,
+                            title: 'NodeJs E8'
+                        }
+                    );
+                }
+            })
+    }
+}
+
+const showMessagesNoQuery = res => {
+    MessageModel.find({}, (err, data) => {
+        if(err){
+            console.log(err)
+        } else {
+            res.render(
+                path.join(__dirname, 'views/messages'),
+                {
+                    messageData: data,
+                    title: 'NodeJs E8'
+                }
+            );
+        }
+    });
+}
+
+exports._getDbData = (req, res) => {
+    MessageModel.find({}, (err, data) => {
+        if(err){
+            console.log(err)
+        } else {
+            res.send(data);
+        }
+    });
+}
+
+setInterval(() => {
+    MessageModel
+        .find({})
+        .select('endsAt')
+        .exec((err, data) => {
+            let currentDate = Date.now();
+            for(let item of data) {
+                if(item.endsAt < currentDate){
+                    MessageModel
+                        .findByIdAndRemove(item._id)
+                        .exec((err, data) => {
+                            if(err){
+                                console.error(err);
+                            }
+                        })
                 }
             }
-            if(breaker){             //  ---|
-                breaker = false;     // ------- solution to avoid labels
-                break;               //  ---|
-            }
-            searchRes.push(dbItem);
-        }
-        if(!searchRes.length){
-            return res.end("Nothing found");
-        }
-        res.json(searchRes);
-    } else {
-        res.status(200).json({data: db});
-    }
-};
+        })
+        ;
+}, 2000);
 
-// save a message
-exports.saveMessage = (req, res)=>{
-    let resMessage = req.body;
-    let db = req.app.locals.messages;
-    db.push(resMessage);
-
-    // get message to remove
-    // arr.find did not work, had to do that because arr.length is dinamic (arr.length is id of messages) and can reduce and enlarge
-    let mesToRemove = {};
-
-    for (let val of db){
-        if(val._id === resMessage._id){
-            mesToRemove = val;
-        }
-    }
-
-    // remove message timeout
-    setTimeout(()=>{
-        db.splice(db.indexOf(mesToRemove), 1);
-    }, resMessage.show * 1000);
-
-    res.send('OK');
-};
-
-exports.handler404 = (req, res, next) => {
+exports.handler404 = (req, res) => {
     res.status('404').end("Not Found");
 };
-

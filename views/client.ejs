@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <title><%= title %></title>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-4">
+                <form>
+                    <div class="form-group">
+                        <label for="data-username">Username</label>
+                        <input type="email" class="form-control" id="data-username" aria-describedby="username" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="data-message">Message</label>
+                        <textarea class="form-control" id="data-message" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="data-show">Select endAt</label>
+                        <select class="form-control" id="data-show">
+                            <% endsAt.forEach(function(option) { %>
+                                <option><%= option %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="row justify-content-center">
+                        <button type="submit" class="btn btn-primary data-send">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(".data-send").click(e => {
+            e.preventDefault();
+            let username = $("#data-username").val();
+            let message = $("#data-message").val();
+            let show = $("#data-show").val();
+
+            $.ajax('/', {
+                type: 'POST',
+                url: '/',
+                data: {username, message, show},
+            })
+            .done(data => {
+                alert( JSON.stringify(data) );
+                $("#data-username").val('');
+                $("#data-message").val('');
+                $("#data-show").val('1');
+            })
+            .fail(err => {
+                alert(  JSON.stringify(err) );
+            });
+        });
+    </script>
+</body>
+</html>

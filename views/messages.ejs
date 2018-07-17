@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <title><%= title %></title>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <div class="list-group list-messages">
+                    <% if(messageData){ %>
+                        <% messageData.forEach(message => { %>
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1"><%= message.username %></h5>
+                                <small><%= message.createdAt.toLocaleString() %></small>
+                            </div>
+                            <p class="mb-1"><%= message.message %></p>      
+                            <hr>      
+                        <% }) %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
